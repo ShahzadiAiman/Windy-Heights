@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 09272de6baf944ef1a3a52e3a0f5170b
+guid: 12fee6f331da34471aa270d8e1659560
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - pinPrefab: {fileID: 6844992173040277988, guid: 780344b00198844b19bd0277dfdf5cad, type: 3}
+  - colorDropdown: {fileID: 2234012292859075048, guid: d5bf8544077f24bd9963e7fccc002b00, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 09272de6baf944ef1a3a52e3a0f5170b
+guid: 6d1c69eca69504b3b861a517f8aff6e5
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - pinPrefab: {fileID: 6844992173040277988, guid: 780344b00198844b19bd0277dfdf5cad, type: 3}
+  - popSound: {fileID: 8300000, guid: 3eedb024347fc43abb9ba1757f555ae6, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

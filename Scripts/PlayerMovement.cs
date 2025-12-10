@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,6 +9,14 @@ public class kitescript : MonoBehaviour
     private SpriteRenderer sr;
     private Vector2 moveInput;
     private Collider2D col;
+
+    // ⭐ ADDED: So movement freezes during pushback
+    private bool isPushedBack = false;
+
+    // ⭐ ADDED: Settings for pushback
+    public float pushDistance = 1f;
+    public float pushDuration = 0.25f;
+    //--
 
     void Start() 
     {
@@ -31,6 +40,9 @@ public class kitescript : MonoBehaviour
 
     void Update()
     {
+        // ⭐ ADDED: Stop WASD while being pushed back
+        if (isPushedBack) return;
+
         moveInput = Vector2.zero;
 
         //Get current keyboard
@@ -67,6 +79,9 @@ public class kitescript : MonoBehaviour
 
     void FixedUpdate()
     {
+        // ⭐ ADDED: Freeze movement during pushback
+        if (isPushedBack) return;
+
         Vector2 newPos = rb.position + moveInput * speed * Time.fixedDeltaTime;
 
         Camera cam = Camera.main;
@@ -89,5 +104,79 @@ public class kitescript : MonoBehaviour
         // Move the Rigidbody2D to the new position
         rb.MovePosition(newPos);
     }
+
+    // ⭐ ADDED: Cloud collision trigger
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Cloud"))
+        {
+            StartCoroutine(PushBackEffect());
+        }
+    }
+
+    // ⭐ ADDED: Pushback animation
+    
+    private IEnumerator PushBackEffect()
+    {
+        isPushedBack = true;
+
+        Vector3 startPos = transform.position;
+
+        // --- STEP 1: small downward push ---
+        float downDistance1 = 2f;  // smaller push
+        float duration1 = 0.30f;
+        for (float t = 0; t < duration1; t += Time.deltaTime)
+        {
+            transform.position = startPos + Vector3.down * downDistance1 * (t / duration1);
+            yield return null;
+        }
+
+        // --- STEP 2: smooth, gentle loose curl ---
+        Vector3[] curlPoints = new Vector3[]
+        {
+            new Vector3(-0.4f, 0.15f),
+            new Vector3(-0.2f, 0.25f),
+            new Vector3(0f, 0.3f),
+            new Vector3(0.2f, 0.25f),
+            new Vector3(0.4f, 0.15f),
+            new Vector3(0.2f, 0f),
+            new Vector3(0f, -0.1f),
+            new Vector3(-0.2f, 0f)
+        };
+
+        Vector3 curlStart = transform.position;
+        for (int i = 0; i < curlPoints.Length - 1; i++)
+        {
+            Vector3 p0 = curlStart + curlPoints[i];
+            Vector3 p1 = curlStart + curlPoints[i + 1];
+            float segmentDuration = 0.04f;
+
+            float t = 0;
+            while (t < 1f)
+            {
+                t += Time.deltaTime / segmentDuration;
+                transform.position = Vector3.Lerp(p0, p1, t);
+                yield return null;
+            }
+        }
+
+        // --- STEP 3: small downward push ---
+        Vector3 finalStart = transform.position;
+        float downDistance2 = 2f;  // smaller push
+        float duration2 = 0.30f;
+        for (float t = 0; t < duration2; t += Time.deltaTime)
+        {
+            transform.position = finalStart + Vector3.down * downDistance2 * (t / duration2);
+            yield return null;
+        }
+
+        isPushedBack = false;
+    }
+
+
+
+
+
+
 
 }

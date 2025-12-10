@@ -6,6 +6,7 @@ public class BalloonGrowth : MonoBehaviour
     public float maxSize = 3f;
 
     private GameManager gameManager;
+    private bool isPopped = false;
 
     void Start()
     {
@@ -31,9 +32,12 @@ public class BalloonGrowth : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    
     public void Pop()
     {
+        if (isPopped) return; // <- Prevent double pops
+        isPopped = true;
+    
         CancelInvoke(nameof(Grow));
 
         // 🔊 Play pop sound if available
@@ -44,6 +48,34 @@ public class BalloonGrowth : MonoBehaviour
         if (gameManager != null)
             gameManager.AddScore(transform.localScale.x);
 
-        Destroy(gameObject);
+        // Start the pop animation instead of instantly destroying
+        StartCoroutine(PopAnimation());
     }
+
+    // New coroutine at the bottom of your class
+    private System.Collections.IEnumerator PopAnimation()
+    {
+        float duration = 0.3f; // how long the pop lasts
+        Vector3 originalScale = transform.localScale;
+        Vector3 targetScale = Vector3.zero; // shrink to nothing
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+
+            // Shrink
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, t);
+
+            // Spin
+            transform.Rotate(0f, 0f, 360f * Time.deltaTime / duration);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localScale = targetScale;
+        Destroy(gameObject); // remove the balloon after animation
+    }
+
 }
